@@ -12,6 +12,9 @@ struct HomeView: View {
 	@State private var showPortfolio: Bool = false // Animates right
 	@State private var showPortFolioView: Bool = false // Pops up the new sheet
 	
+	@State private var selectedCoin: CoinModel? = nil
+	@State private var showDetailsView: Bool = false
+	
     var body: some View {
 			ZStack {
 				Color.theme.background
@@ -32,6 +35,7 @@ struct HomeView: View {
 							coins: homeVM.allCoins, 
 							transitionEdge: .leading
 						)
+//						.redacted(reason: .placeholder) // shimmer effect
 					}
 					
 					if showPortfolio {
@@ -41,15 +45,25 @@ struct HomeView: View {
 							showHoldingsColumn: true
 						)
 					}
-					
 					Spacer(minLength: 0)
 				}
-				
 			}
+			.background(
+				// This approach is better as the DetailsView screens won't just load like that without being clicked... that's a better approach, than passing the NavigationLink straightup to the view on each Coin item...
+				NavigationLink(
+					isActive: $showDetailsView,
+					destination: {
+//						DetailsView(coin: $selectedCoin)
+						DetailsLoadingView(coin: $selectedCoin)
+					},
+					label: {
+						EmptyView()
+					})
+			)
     }
 }
 
-
+ 
 extension HomeView {
 	private var homeHeader: some View {
 		HStack {
@@ -88,6 +102,9 @@ extension HomeView {
 	) -> some View {
 		List {
 			ForEach(coins) {coin in
+//				NavigationLink(destination: {
+//					DetailsView(coin: coin)
+//				}, label: {})
 				CoinRowView(
 					coin: coin,
 					showHoldingsColumn: showHoldingsColumn
@@ -100,10 +117,19 @@ extension HomeView {
 						trailing: 10
 					)
 				)
+				.onTapGesture {
+					customNavigate(coin: coin)
+				}
 			}
 		}
 		.listStyle(PlainListStyle())
 		.transition(.move(edge: transitionEdge))
+	}
+	
+	private func customNavigate(coin: CoinModel) {
+		// Normally, when we use the normal NavigationLink, it'll pre-build all the Coin's DetailView, and that is not efficient as it'll end up slow the system down...
+		selectedCoin = coin
+		showDetailsView.toggle()
 	}
 	
 	private var columnTitles: some View {

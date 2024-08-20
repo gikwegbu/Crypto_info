@@ -22,6 +22,10 @@ struct CoinRowView: View {
 				rightColumn
 				}
 			.font(.headline)
+			// At the moment, due to the Spacer(), the space between the left and right column isn't clickable, so adding a background to it forces it to be clickable.
+			.background(
+				Color.theme.background.opacity(0.001)
+			)
     }
 }
 
