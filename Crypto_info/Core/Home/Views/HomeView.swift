@@ -66,7 +66,7 @@ struct HomeView: View {
  
 extension HomeView {
 	private var homeHeader: some View {
-		HStack {
+		HStack {  
 			CircleBtnView(icon: showPortfolio ? "plus" : "info")
 			// The ios 15.  makes the .animation to accept a 'value' of what is being animated.. so as to tie it directly, and not let it affect every other stuff around it...
 				.animation(.none, value: showPortfolio)
