@@ -24,6 +24,7 @@ struct DetailsLoadingView: View {
 
 struct DetailsView: View {
 	@StateObject private var vm: CoinDetailViewModel
+	@State private var showFullDesc: Bool = false
 	private var spacing: CGFloat = 30
 	private let cols: [GridItem] = [
 		GridItem(.flexible()),
@@ -36,25 +37,90 @@ struct DetailsView: View {
 	
     var body: some View {
 			ScrollView{
-				VStack(spacing: 20) {
-					Text("Hello")
-						.frame(height: 150)
-					
-					titleDesign(text: "Overview")
-					Divider()
-					gridDesign(items: vm.overviewStatistics)
-					titleDesign(text: "Additional Details")
-					
-					Divider()
-					gridDesign(items: vm.additionalStatistics)
+				VStack {
+					ChartView(coin: vm.coin)
+						.padding(.vertical)
+					VStack(spacing: 20) {
+						titleDesign(text: "Overview")
+						Divider()
+						descriptionSection
+						gridDesign(items: vm.overviewStatistics)
+						titleDesign(text: "Additional Details")
+						Divider()
+						gridDesign(items: vm.additionalStatistics)
+						websiteSection
+					}
+					.padding()
 				}
-				.padding()
 			}
 			.navigationTitle(vm.coin.name)
+			.toolbar{
+				ToolbarItem(placement: .topBarTrailing) {
+					navBarTrailingItem
+				}
+			}
     }
 }
 
 extension DetailsView {
+	
+	private var navBarTrailingItem: some View {
+		HStack {
+			Text(vm.coin.symbol.uppercased())
+				.font(.headline)
+			.foregroundStyle(Color.theme.secondaryText)
+			CoinImageView(coin: vm.coin)
+				.frame(width: 25, height: 50)
+		}
+	}
+	
+	
+	private var descriptionSection: some View {
+		ZStack {
+			if let coinDesc = vm.coinDescription,
+				 !coinDesc.isEmpty {
+				VStack(alignment: .leading) {
+					Text(coinDesc)
+						.lineLimit(showFullDesc ? nil : 3)
+						.font(.callout)
+						.foregroundStyle(Color.theme.secondaryText)
+					
+					Button {
+						withAnimation(.linear) {
+							showFullDesc.toggle()
+						}
+					} label: {
+						Text(showFullDesc ? "Less..." : "Read more...")
+							.font(.caption)
+							.fontWeight(.bold)
+							.padding(.vertical, 4)
+					}
+					.accentColor(.blue)
+				}
+				.frame(maxWidth: .infinity, alignment: .leading)
+			}
+		}
+	}
+	
+	private var websiteSection: some View {
+		VStack(alignment: .leading, spacing: 20) {
+			if let websiteString = vm.websiteURL {
+//								let url = URL(string: websiteString)
+				let link = "[Website](\(websiteString))"
+				Text(.init(link))
+//								Link("Website", destination: url)
+			}
+			
+			if let redditString = vm.redditURL {
+				let link = "[Reddit](\(redditString))"
+				Text(.init(link))
+			}
+		}
+		.accentColor(.blue)
+		.frame(maxWidth: .infinity, alignment: .leading)
+		.font(.headline)
+	}
+	
 	private func titleDesign(text: String) -> some View {
 		Text(text)
 			.font(.title)
