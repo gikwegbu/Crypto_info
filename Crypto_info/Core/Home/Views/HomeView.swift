@@ -11,6 +11,7 @@ struct HomeView: View {
 	@EnvironmentObject var homeVM: HomeViewModel
 	@State private var showPortfolio: Bool = false // Animates right
 	@State private var showPortFolioView: Bool = false // Pops up the new sheet
+	@State private var showSettingsView: Bool = false
 	
 	@State private var selectedCoin: CoinModel? = nil
 	@State private var showDetailsView: Bool = false
@@ -47,6 +48,9 @@ struct HomeView: View {
 					}
 					Spacer(minLength: 0)
 				}
+				.sheet(isPresented: $showSettingsView, content: {
+					SettingsView()
+				})
 			}
 			.background(
 				// This approach is better as the DetailsView screens won't just load like that without being clicked... that's a better approach, than passing the NavigationLink straightup to the view on each Coin item...
@@ -71,7 +75,7 @@ extension HomeView {
 			// The ios 15.  makes the .animation to accept a 'value' of what is being animated.. so as to tie it directly, and not let it affect every other stuff around it...
 				.animation(.none, value: showPortfolio)
 				.onTapGesture {
-					showPortFolioView.toggle()
+					showPortfolio ? showPortFolioView.toggle() :	showSettingsView.toggle()
 				}
 				.background(
 					CircleBtnAnimationView(animate: $showPortfolio)
