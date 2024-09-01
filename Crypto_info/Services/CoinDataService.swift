@@ -84,6 +84,7 @@ class CoinDataService {
 //					self.coinSub?.cancel()
 //				}
 //			}
+			.receive(on: DispatchQueue.main) // Removed this from the NetworkManger, so that the decode still works in the background thread and then received on the main thread.
 			.sink(receiveCompletion: NetworkManager.handleCompletion, receiveValue: { [weak self] (returnedCoins) in
 				if let s = self {
 					s.allCoins = returnedCoins

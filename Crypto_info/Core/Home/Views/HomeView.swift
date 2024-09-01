@@ -40,11 +40,19 @@ struct HomeView: View {
 					}
 					
 					if showPortfolio {
-						coinList(
-							coins: homeVM.portfolioCoins,
-							transitionEdge: .trailing,
-							showHoldingsColumn: true
-						)
+						ZStack(alignment: .top) {
+							if homeVM.portfolioCoins.isEmpty && homeVM.searchText.isEmpty {
+								portfolioEmptyState
+									
+							} else {
+								coinList(
+									coins: homeVM.portfolioCoins,
+//									transitionEdge: .trailing,
+									showHoldingsColumn: true
+								)
+							}
+						}
+						.transition(.move(edge: .trailing))
 					}
 					Spacer(minLength: 0)
 				}
@@ -70,7 +78,7 @@ struct HomeView: View {
  
 extension HomeView {
 	private var homeHeader: some View {
-		HStack {  
+		HStack {
 			CircleBtnView(icon: showPortfolio ? "plus" : "info")
 			// The ios 15.  makes the .animation to accept a 'value' of what is being animated.. so as to tie it directly, and not let it affect every other stuff around it...
 				.animation(.none, value: showPortfolio)
@@ -97,7 +105,7 @@ extension HomeView {
 		}
 		.padding()
 	}
-	 
+	
 	
 	private func  coinList(
 		coins: [CoinModel],
@@ -106,9 +114,9 @@ extension HomeView {
 	) -> some View {
 		List {
 			ForEach(coins) {coin in
-//				NavigationLink(destination: {
-//					DetailsView(coin: coin)
-//				}, label: {})
+				//				NavigationLink(destination: {
+				//					DetailsView(coin: coin)
+				//				}, label: {})
 				CoinRowView(
 					coin: coin,
 					showHoldingsColumn: showHoldingsColumn
@@ -124,6 +132,7 @@ extension HomeView {
 				.onTapGesture {
 					customNavigate(coin: coin)
 				}
+				.listRowBackground(Color.theme.background)
 			}
 		}
 		.listStyle(PlainListStyle())
@@ -141,8 +150,8 @@ extension HomeView {
 			HStack(spacing: 4) {
 				Text("Coin")
 				Image(systemName: "chevron.down")
-//					.opacity(homeVM.matchSort(sort: .rank))
-//					.opacity((homeVM.sortOption == .rank || homeVM.sortOption == .rankReversed) ? 1.0 : 0.0)
+				//					.opacity(homeVM.matchSort(sort: .rank))
+				//					.opacity((homeVM.sortOption == .rank || homeVM.sortOption == .rankReversed) ? 1.0 : 0.0)
 					.opacity((homeVM.matchSort(sort: .rank) || homeVM.matchSort(sort: .rankReversed)) ? 1.0 : 0.0)
 					.rotationEffect(Angle(degrees: homeVM.matchSort(sort: .rank) ? 0 : 180))
 			}
@@ -174,12 +183,12 @@ extension HomeView {
 					.rotationEffect(Angle(degrees: homeVM.matchSort(sort: .price) ? 0 : 180))
 			}
 			// Making the price width match the rightColumn we built earlier
-				.frame(width: UIScreen.main.bounds.width / 3.5)
-				.onTapGesture {
-					withAnimation(.default) {
-						homeVM.sortOption = homeVM.matchSort(sort: .price) ? .priceReversed : .price
-					}
+			.frame(width: UIScreen.main.bounds.width / 3.5)
+			.onTapGesture {
+				withAnimation(.default) {
+					homeVM.sortOption = homeVM.matchSort(sort: .price) ? .priceReversed : .price
 				}
+			}
 			
 			// Adding a reloading item here
 			Button {
@@ -190,11 +199,18 @@ extension HomeView {
 				Image(systemName: "goforward")
 			}
 			.rotationEffect(Angle(degrees: homeVM.isLoading ? 360 : 0), anchor: .center)
-
+			
 		}
 		.font(.caption)
 		.foregroundStyle(Color.theme.secondaryText)
 		.padding(.horizontal)
+	}
+	
+	private var portfolioEmptyState: some View {
+		Text("Oops!!! No Coins Yet\nClick the + button to add coins")
+			.font(.callout)
+			.foregroundStyle(Color.theme.accent)
+			.multilineTextAlignment(.center)
 	}
 }
 

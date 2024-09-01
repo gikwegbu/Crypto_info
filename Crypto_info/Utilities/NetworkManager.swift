@@ -36,7 +36,8 @@ class NetworkManager {
 //					return output.data
 //				}
 				.tryMap({try handleURLResponse(output: $0 , url: url)})
-				.receive(on: DispatchQueue.main)
+				.retry(4)
+//				.receive(on: DispatchQueue.main) // since this returns the threading to the main, meaning that anyother filtering is running on the main thread, '.decode' inclusive, and we don't want that, though it works sha. So we'd be addint .receive(on: DispatchQueue.main) on each service using this utility after decoding the json
 				.eraseToAnyPublisher()
 		}
 	

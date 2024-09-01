@@ -19,11 +19,21 @@ struct SettingsView: View {
 	
     var body: some View {
 			NavigationView {
-				List {
-					appDetailsSection
-					coinGeckoSection
-					appDevSection
-					legalDocSection
+				ZStack {
+					// background
+					Color.theme.background.ignoresSafeArea()
+					
+					// content
+					List {
+						appDetailsSection
+							.listRowBackground(Color.theme.background.opacity(0.5))
+						coinGeckoSection
+							.listRowBackground(Color.theme.background.opacity(0.5))
+						appDevSection
+							.listRowBackground(Color.theme.background.opacity(0.5))
+						legalDocSection
+							.listRowBackground(Color.theme.background.opacity(0.5))
+					}
 				}
 			}
 			.listStyle(GroupedListStyle())

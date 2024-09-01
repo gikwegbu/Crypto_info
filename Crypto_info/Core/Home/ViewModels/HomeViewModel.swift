@@ -196,7 +196,7 @@ class HomeViewModel: ObservableObject {
 			.reduce(0, +)
 		
 		let nonZeroPreviousValue = previousValue == 0 ? 1 : previousValue // This way, we won't get an error, leading to a NAN value
-		let percentageChange = ((portfolioValue - previousValue) / nonZeroPreviousValue) * 100 // Simple maths calculation  (New Price - Old Price) ÷ Old Price, and then multiply that number by 100
+		let percentageChange = ((portfolioValue - previousValue) / nonZeroPreviousValue)
 		
 		let portfolio = StatisticsModel(
 			title: "Portfolio Value",
